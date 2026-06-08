@@ -1,1 +1,65 @@
-<p>feed works!</p>
+<div class="feed-layout">
+  <!-- Barre de navigation supérieure -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <span class="brand">MiniSocial</span>
+      <button (click)="onLogout()" class="btn-logout">Déconnexion</button>
+    </div>
+  </nav>
+
+  <div class="feed-container">
+    <!-- Zone de création de publication -->
+    <div class="share-card">
+      <h3>Quoi de neuf aujourd'hui ?</h3>
+      
+      <div *ngIf="errorMessage" class="alert-error">
+        {{ errorMessage }}
+      </div>
+
+      <form [formGroup]="postForm" (ngSubmit)="$event.preventDefault(); onPublish()">
+        <div class="form-group">
+          <textarea 
+            formControlName="content" 
+            placeholder="Partagez quelque chose avec la communauté..."
+            rows="3">
+          </textarea>
+          <div *ngIf="postForm.get('content')?.touched && postForm.get('content')?.invalid" class="error-msg">
+            Le contenu du message ne peut pas être vide.
+          </div>
+        </div>
+        
+        <button type="submit" [disabled]="postForm.invalid || submitLoading" class="btn-publish">
+          <span *ngIf="!submitLoading">Publier</span>
+          <span *ngIf="submitLoading">Publication...</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Indicateur de chargement principal (Critère 8) -->
+    <div *ngIf="loading" class="spinner-container">
+      <div class="spinner"></div>
+      <p>Chargement des publications...</p>
+    </div>
+
+    <!-- Liste des publications -->
+    <div *ngIf="!loading" class="posts-list">
+      <div *ngFor="let post of posts" class="post-card">
+        <div class="post-header">
+          <div class="avatar">{{ post.author?.username?.charAt(0).toUpperCase() }}</div>
+          <div class="meta">
+            <span class="username">&#64;{{ post.author?.username }}</span>
+            <span class="date">{{ post.created_at | date:'short' }}</span>
+          </div>
+        </div>
+        <div class="post-content">
+          <p>{{ post.content }}</p>
+        </div>
+      </div>
+
+      <!-- Message si le fil est vide -->
+      <div *ngIf="posts.length === 0" class="empty-feed">
+        <p>Aucune publication pour le moment. Soyez le premier à vous exprimer !</p>
+      </div>
+    </div>
+  </div>
+</div>
