@@ -1,0 +1,48 @@
+
+<div class="login-container">
+  <div class="login-card">
+    <h2>Connexion</h2>
+    <p class="subtitle">Accédez à votre mini réseau social</p>
+
+    <!-- Message d'erreur API -->
+    <div *ngIf="errorMessage" class="alert-error">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="$event.preventDefault(); onSubmit()">
+      <!-- Champ Username -->
+      <div class="form-group">
+        <label for="username">Nom d'utilisateur</label>
+        <input 
+          id="username" 
+          type="text" 
+          formControlName="username" 
+          placeholder="Entrez votre pseudo"
+        />
+        <div *ngIf="loginForm.get('username')?.touched && loginForm.get('username')?.invalid" class="error-msg">
+          Le nom d'utilisateur est requis (minimum 3 caractères).
+        </div>
+      </div>
+
+      <!-- Champ Password -->
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input 
+          id="password" 
+          type="password" 
+          formControlName="password" 
+          placeholder="Entrez votre mot de passe"
+        />
+        <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="error-msg">
+          Le mot de passe est requis (minimum 4 caractères).
+        </div>
+      </div>
+
+      <!-- Bouton de soumission avec indicateur de chargement -->
+      <button type="submit" [disabled]="loginForm.invalid || loading" class="btn-submit">
+        <span *ngIf="!loading">Se connecter</span>
+        <span *ngIf="loading">Connexion en cours...</span>
+      </button>
+    </form>
+  </div>
+</div>
