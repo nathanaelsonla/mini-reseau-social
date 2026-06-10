@@ -1,65 +1,126 @@
-<div class="feed-layout">
-  <!-- Barre de navigation supérieure -->
-  <nav class="navbar">
-    <div class="nav-container">
-      <span class="brand">MiniSocial</span>
-      <button (click)="onLogout()" class="btn-logout">Déconnexion</button>
-    </div>
-  </nav>
-
-  <div class="feed-container">
-    <!-- Zone de création de publication -->
-    <div class="share-card">
-      <h3>Quoi de neuf aujourd'hui ?</h3>
-      
-      <div *ngIf="errorMessage" class="alert-error">
-        {{ errorMessage }}
+<div class="app-layout" [ngClass]="{'sidebar-collapsed': isSidebarCollapsed}">
+  
+  <!-- MODAL D'ONBOARDING -->
+  <div *ngIf="showOnboarding" class="onboarding-overlay">
+    <div class="onboarding-card">
+      <h3>Bienvenue ! Qu'aimeriez-vous voir en priorité ? 🚀</h3>
+      <p>Sélectionnez vos thématiques préférées pour personnaliser votre profil.</p>
+      <div class="interests-grid">
+        <button *ngFor="let topic of availableTopics" type="button" (click)="toggleTopic(topic)" [ngClass]="{'selected': selectedTopics.includes(topic)}" class="topic-chip">{{ topic }}</button>
       </div>
-
-      <form [formGroup]="postForm" (ngSubmit)="$event.preventDefault(); onPublish()">
-        <div class="form-group">
-          <textarea 
-            formControlName="content" 
-            placeholder="Partagez quelque chose avec la communauté..."
-            rows="3">
-          </textarea>
-          <div *ngIf="postForm.get('content')?.touched && postForm.get('content')?.invalid" class="error-msg">
-            Le contenu du message ne peut pas être vide.
-          </div>
-        </div>
-        
-        <button type="submit" [disabled]="postForm.invalid || submitLoading" class="btn-publish">
-          <span *ngIf="!submitLoading">Publier</span>
-          <span *ngIf="submitLoading">Publication...</span>
-        </button>
-      </form>
+      <button (click)="saveInterests()" [disabled]="selectedTopics.length < 2" class="btn-save-onboarding">Continuer vers mon espace</button>
     </div>
+  </div>
 
-    <!-- Indicateur de chargement principal (Critère 8) -->
-    <div *ngIf="loading" class="spinner-container">
-      <div class="spinner"></div>
-      <p>Chargement des publications...</p>
-    </div>
-
-    <!-- Liste des publications -->
-    <div *ngIf="!loading" class="posts-list">
-      <div *ngFor="let post of posts" class="post-card">
-        <div class="post-header">
-          <div class="avatar">{{ post.author?.username?.charAt(0).toUpperCase() }}</div>
-          <div class="meta">
-            <span class="username">&#64;{{ post.author?.username }}</span>
-            <span class="date">{{ post.created_at | date:'short' }}</span>
-          </div>
-        </div>
-        <div class="post-content">
-          <p>{{ post.content }}</p>
-        </div>
-      </div>
-
-      <!-- Message si le fil est vide -->
-      <div *ngIf="posts.length === 0" class="empty-feed">
-        <p>Aucune publication pour le moment. Soyez le premier à vous exprimer !</p>
+  <!-- MODAL DE CRÉATION DE PAGE -->
+  <div *ngIf="showCreatePageModal" class="onboarding-overlay">
+    <div class="onboarding-card">
+      <h3>Créer une nouvelle Page 📄</h3>
+      <p>Créez un espace communautaire (ex: Page_Basket). Les publications seront réservées aux membres.</p>
+      <input type="text" [(ngModel)]="newPageTitle" placeholder="Nom de la page (ex: Fans_De_Dunk)" class="search-input" style="margin-bottom: 15px; width: 100%; box-sizing: border-box;" />
+      <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <button (click)="onCreatePage()" [disabled]="!newPageTitle.trim()" class="btn-accent-publish" style="flex: 1;">Créer la page</button>
+        <button (click)="showCreatePageModal = false" class="btn-sidebar-logout" style="flex: 1; border-color: #cbd5e1; color: #636b74;">Annuler</button>
       </div>
     </div>
   </div>
+
+  <!-- SIDEBAR GAUCHE -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-text">MiniSocial</span>
+      <span class="brand-icon">MS</span>
+    </div>
+    
+    <div class="user-profile-summary" [routerLink]="['/profile', currentUser.username]" style="cursor: pointer;">
+      <div class="main-avatar">N</div>
+      <div class="user-info">
+        <span class="full-name">{{ currentUser.username }}</span>
+        <span class="sub-username">&#64;{{ currentUser.username.toLowerCase() }}</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-menu">
+      <a routerLink="/feed" class="menu-item active"><span class="icon">🏠</span> <span class="menu-label">Fil d'actualité</span></a>
+      <a [routerLink]="['/profile', currentUser.username]" class="menu-item"><span class="icon">👤</span> <span class="menu-label">Mon Profil</span></a>
+      <button (click)="showCreatePageModal = true" class="menu-item" style="background: transparent; border: none; width: 100%; text-align: left; cursor: pointer;"><span class="icon">📄</span> <span class="menu-label">Créer une Page</span></button>
+    </nav>
+
+    <button (click)="onLogout()" class="btn-sidebar-logout"><span class="menu-label">Déconnexion</span> <span class="logout-icon">🚪</span></button>
+  </aside>
+
+  <!-- CONTENU PRINCIPAL ÉTIRABLE -->
+  <main class="feed-main-content">
+    
+    <!-- BARRE DE RECHERCHE SUPÉRIEURE -->
+    <header class="content-header" style="flex-direction: column; align-items: stretch; gap: 10px; padding: 15px 20px;">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <button (click)="toggleSidebar()" class="btn-toggle-sidebar">☰</button>
+        <h2>Accueil</h2>
+      </div>
+      
+      <!-- Système de recherche -->
+      <div class="search-container" style="position: relative; margin-top: 5px;">
+        <input type="text" placeholder="🔍 Rechercher un utilisateur ou une page..." class="search-input" [(ngModel)]="searchQuery" (input)="onSearch()" />
+        
+        <!-- Résultats de la recherche -->
+        <div *ngIf="searchResults.length > 0 && searchQuery" class="search-results-dropdown">
+          <div *ngFor="let result of searchResults" class="search-result-item" (click)="goToResult(result)">
+            <div class="result-avatar">{{ result.type === 'page' ? '📄' : '👤' }}</div>
+            <div class="result-info">
+              <span class="result-name">{{ result.name }}</span>
+              <span class="result-type">{{ result.type === 'page' ? 'Page Communautaire' : '@' + result.name.toLowerCase() }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    
+    <!-- Zone d'écriture -->
+    <div class="share-box">
+      <div class="share-box-header">
+        <div class="avatar-sm" [routerLink]="['/profile', currentUser.username]" style="cursor: pointer;">N</div>
+        <form [formGroup]="postForm" (ngSubmit)="$event.preventDefault(); onPublish()" class="share-form">
+          <textarea formControlName="content" placeholder="Quoi de neuf aujourd'hui ?" rows="2"></textarea>
+          <div *ngIf="imagePreview" class="image-preview-container">
+            <img [src]="imagePreview" alt="Prévisualisation" class="attached-image-preview" />
+            <button type="button" class="btn-remove-img" (click)="removeSelectedImage()">✕</button>
+          </div>
+          <div class="share-actions">
+            <label for="file-upload" class="custom-file-upload"><span>🖼️ Photo</span></label>
+            <input id="file-upload" type="file" accept="image/*" (change)="onFileSelected($event)" style="display:none;"/>
+            <button type="submit" [disabled]="postForm.invalid || submitLoading" class="btn-accent-publish">Publier</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Flux de publications -->
+    <div *ngIf="!loading && posts.length > 0" class="posts-feed">
+      <article *ngFor="let post of posts" class="modern-post-card">
+        <div class="post-sidebar-avatar" [routerLink]="['/profile', post.author?.username]" style="cursor: pointer;">
+          <div class="avatar-md">{{ post.author?.username?.charAt(0).toUpperCase() }}</div>
+        </div>
+        <div class="post-body">
+          <header class="post-card-header">
+            <span class="author-name" [routerLink]="['/profile', post.author?.username]" style="cursor: pointer;">{{ post.author?.username }}</span>
+            <span *ngIf="post.belongsToPage" class="page-badge">Page: {{ post.belongsToPage }}</span>
+            <span class="author-handle">&#64;{{ post.author?.username?.toLowerCase() }}</span>
+            <span class="separator">•</span>
+            <span class="post-date">À l'instant</span>
+          </header>
+          <div class="post-text-content"><p>{{ post.content }}</p></div>
+          <div *ngIf="post.image" class="post-attached-image-box"><img [src]="post.image" alt="Illustration" class="post-img" /></div>
+          <footer class="post-footer-actions">
+            <button class="action-trigger like-trigger" [ngClass]="{'liked': post.isLiked}" (click)="toggleLike(post)"><span class="icon">{{ post.isLiked ? '❤️' : '🖤' }}</span> <span>{{ post.likesCount }}</span></button>
+            <button class="action-trigger" (click)="toggleCommentsSection(post)"><span class="icon">💬</span> <span>{{ post.comments?.length }}</span></button>
+          </footer>
+        </div>
+      </article>
+    </div>
+
+    <div *ngIf="!loading && posts.length === 0" class="empty-feed">
+      <p>Aucune publication pour le moment. Soyez le premier à partager quelque chose ! ✍️</p>
+    </div>
+  </main>
 </div>

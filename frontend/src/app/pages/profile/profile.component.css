@@ -1,0 +1,74 @@
+/* Note : On réutilise la même structure de mise en page réactive de la Sidebar */
+.app-layout { display: flex; min-height: 100vh; background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+.sidebar {
+  width: 275px; background-color: #ffffff; border-right: 1px solid #eff3f4;
+  padding: 20px; position: fixed; height: 100vh; display: flex;
+  flex-direction: column; box-sizing: border-box; transition: width 0.25s ease, padding 0.25s; z-index: 200;
+}
+.brand-icon { display: none; font-size: 22px; font-weight: 900; color: #667eea; }
+.sidebar-collapsed .sidebar { width: 75px; padding: 20px 10px; }
+.sidebar-collapsed .menu-label, .sidebar-collapsed .user-info, .sidebar-collapsed .brand-text { display: none; }
+.sidebar-collapsed .brand-icon { display: block; text-align: center; width: 100%; }
+.sidebar-collapsed .user-profile-summary { justify-content: center; padding: 8px; background: transparent; }
+.sidebar-collapsed .menu-item { justify-content: center; padding: 12px; }
+.sidebar-collapsed .feed-main-content { margin-left: 75px; }
+
+.sidebar-brand { font-size: 24px; font-weight: 800; color: #667eea; margin-bottom: 30px; padding-left: 10px; }
+.user-profile-summary { display: flex; align-items: center; padding: 10px; background-color: #f8fafc; border-radius: 9999px; margin-bottom: 25px; }
+.main-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; }
+.user-info { display: flex; flex-direction: column; margin-left: 10px; }
+.full-name { font-weight: 700; font-size: 14px; color: #0f1419; }
+.sub-username { color: #536471; font-size: 13px; }
+.sidebar-menu { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; }
+.menu-item { display: flex; align-items: center; padding: 12px 15px; color: #0f1419; text-decoration: none; font-size: 16px; font-weight: 700; border-radius: 9999px; }
+.menu-item:hover, .menu-item.active { background-color: rgba(102, 126, 234, 0.1); color: #667eea; }
+.menu-item .icon { margin-right: 15px; font-size: 18px; }
+
+.feed-main-content { margin-left: 275px; flex-grow: 1; max-width: 600px; border-right: 1px solid #eff3f4; min-height: 100vh; transition: margin-left 0.25s ease; }
+.content-header { position: sticky; top: 0; background-color: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); display: flex; align-items: center; gap: 15px; padding: 5px 20px; border-bottom: 1px solid #eff3f4; z-index: 100; }
+.btn-toggle-sidebar { background: transparent; border: none; font-size: 20px; cursor: pointer; color: #536471; padding: 5px 10px; border-radius: 8px; }
+.btn-toggle-sidebar:hover { background-color: #f7f9fa; }
+.content-header h2 { font-size: 20px; font-weight: 800; margin: 0; }
+
+/* VISUELS DU PROFIL (HERO BANNER) */
+.profile-scroll-area { padding-bottom: 40px; }
+.profile-hero-section { position: relative; height: 160px; background: #cbd5e1; margin-bottom: 55px; }
+.cover-placeholder { width: 100%; height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); }
+.profile-avatar-large {
+  position: absolute; bottom: -45px; left: 20px; width: 90px; height: 90px;
+  background: #334155; color: white; border: 4px solid #ffffff; border-radius: 50%;
+  display: flex; justify-content: center; align-items: center; font-size: 36px; font-weight: 800;
+}
+
+/* FORMULAIRES DE MODIFICATION */
+.profile-meta-card { padding: 0 20px; margin-bottom: 30px; }
+.form-row { margin-bottom: 18px; display: flex; flex-direction: column; }
+.form-label { font-weight: 700; font-size: 14px; color: #0f1419; margin-bottom: 6px; }
+.input-disabled { background-color: #f1f5f9; border: 1px solid #e2e8f0; padding: 10px 14px; border-radius: 8px; color: #64748b; font-weight: 600; cursor: not-allowed; }
+.form-row textarea { border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 14px; outline: none; font-family: inherit; resize: none; }
+.form-row textarea:focus { border-color: #667eea; }
+.select-wrapper select { width: 100%; border: 1px solid #e2e8f0; padding: 10px 14px; border-radius: 8px; font-size: 14px; outline: none; background: #ffffff; cursor: pointer; }
+.select-wrapper select:focus { border-color: #667eea; }
+.field-explanation { color: #536471; font-size: 12px; margin: 4px 0 0 0; }
+.btn-save-profile { background-color: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 9999px; font-weight: 700; font-size: 14px; cursor: pointer; float: right; }
+
+/* COMPOSANT DES LISTES INTERACTIVES AMIS */
+.network-card { border-top: 1px solid #eff3f4; margin-top: 20px; }
+.tabs-navigation { display: flex; border-bottom: 1px solid #eff3f4; }
+.tab-btn { flex: 1; background: transparent; border: none; padding: 15px 0; font-size: 15px; font-weight: 700; color: #536471; cursor: pointer; text-align: center; transition: all 0.2s; }
+.tab-btn:hover { background-color: rgba(102, 126, 234, 0.05); color: #667eea; }
+.tab-btn.active { color: #667eea; border-bottom: 3px solid #667eea; }
+.tab-btn span { font-weight: 500; font-size: 13px; }
+
+.tab-body-content { padding: 10px 20px; }
+.network-user-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f8fafc; }
+.user-item-left { display: flex; align-items: center; gap: 12px; }
+.avatar-thumbnail { width: 36px; height: 36px; background-color: #e2e8f0; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 700; font-size: 14px; }
+.user-item-info { display: flex; flex-direction: column; }
+.username-title { font-weight: 700; font-size: 14px; color: #0f1419; }
+.friend-indicator { background-color: #d1fae5; color: #065f46; font-size: 11px; padding: 1px 6px; border-radius: 4px; font-weight: 600; width: max-content; margin-top: 2px; }
+
+.btn-action-follow { background-color: #0f1419; color: white; border: none; padding: 6px 14px; border-radius: 9999px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-action-unfollow { background-color: transparent; color: #f4245e; border: 1px solid #f4245e; padding: 6px 14px; border-radius: 9999px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-action-unfollow:hover { background-color: rgba(244, 36, 94, 0.05); }

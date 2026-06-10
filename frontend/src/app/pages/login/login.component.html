@@ -1,48 +1,68 @@
-
-<div class="login-container">
-  <div class="login-card">
-    <h2>Connexion</h2>
-    <p class="subtitle">Connectez vous en tant que utilisateur du réseau </p>
-
-    <!-- Message d'erreur API -->
-    <div *ngIf="errorMessage" class="alert-error">
-      {{ errorMessage }}
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1>MiniSocial</h1>
+      <p>{{ isRegisterMode ? 'Rejoignez notre communauté dès aujourd\'hui' : 'Connectez-vous pour voir l\'actualité de vos amis' }}</p>
     </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="$event.preventDefault(); onSubmit()">
-      <!-- Champ Username -->
+    <form [formGroup]="authForm" (ngSubmit)="onSubmit()" class="auth-form">
+      
       <div class="form-group">
         <label for="username">Nom d'utilisateur</label>
         <input 
           id="username" 
           type="text" 
           formControlName="username" 
-          placeholder="Entrez votre pseudo"
-        />
-        <div *ngIf="loginForm.get('username')?.touched && loginForm.get('username')?.invalid" class="error-msg">
-          Le nom d'utilisateur est requis (minimum 3 caractères).
-        </div>
+          placeholder=""
+          [ngClass]="{'input-error': authForm.get('username')?.invalid && authForm.get('username')?.touched}" />
       </div>
 
-      <!-- Champ Password -->
+      <div *ngIf="isRegisterMode" class="form-group">
+        <label for="email">Adresse Email</label>
+        <input 
+          id="email" 
+          type="email" 
+          formControlName="email" 
+          placeholder="" />
+      </div>
+
+      <div *ngIf="isRegisterMode" class="form-group">
+        <label for="bio">Description</label>
+        <textarea 
+          id="bio" 
+          formControlName="bio" 
+          placeholder="" 
+          rows="2"></textarea>
+      </div>
+
       <div class="form-group">
         <label for="password">Mot de passe</label>
         <input 
           id="password" 
           type="password" 
           formControlName="password" 
-          placeholder="Entrez votre mot de passe"
-        />
-        <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="error-msg">
-          Le mot de passe est requis (minimum 4 caractères).
-        </div>
+          placeholder="••••••••" />
       </div>
 
-      <!-- Bouton de soumission avec indicateur de chargement -->
-      <button type="submit" [disabled]="loginForm.invalid || loading" class="btn-submit">
-        <span *ngIf="!loading">Se connecter</span>
-        <span *ngIf="loading">Connexion en cours...</span>
+      <div *ngIf="errorMessage" class="error-banner">
+        ⚠️ {{ errorMessage }}
+      </div>
+
+      <button type="submit" [disabled]="authForm.invalid || loading" class="btn-auth-submit">
+        <span *ngIf="!loading">{{ isRegisterMode ? 'Créer mon compte' : 'Se connecter' }}</span>
+        <span *ngIf="loading">Patientez...</span>
       </button>
     </form>
+
+    <div class="auth-footer">
+      <p *ngIf="!isRegisterMode">
+        Nouveau sur l'application ? 
+        <button type="button" (click)="toggleMode()" class="btn-toggle-link">Créer un compte</button>
+      </p>
+      <p *ngIf="isRegisterMode">
+        Vous possédez déjà un compte ? 
+        <button type="button" (click)="toggleMode()" class="btn-toggle-link">Se connecter</button>
+      </p>
+    </div>
   </div>
 </div>

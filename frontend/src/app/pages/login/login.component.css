@@ -1,111 +1,125 @@
-/* Centrage complet de la carte de connexion sur l'écran */
-.login-container {
+.auth-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   padding: 20px;
   box-sizing: border-box;
 }
 
-/* Style de la carte de connexion */
-.login-card {
+.auth-card {
   background: #ffffff;
   padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border-radius: 24px;
   width: 100%;
-  max-width: 400px;
-  box-sizing: border-box;
+  max-width: 440px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
 }
 
-.login-card h2 {
-  margin: 0 0 10px 0;
-  color: #333333;
-  text-align: center;
-  font-size: 28px;
-}
-
-.subtitle {
-  color: #777777;
+.auth-header {
   text-align: center;
   margin-bottom: 30px;
-  font-size: 14px;
 }
 
-/* Groupes de formulaires */
+.auth-header h1 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #667eea;
+  margin: 0 0 8px 0;
+}
+
+.auth-header p {
+  color: #64748b;
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
 .form-group {
-  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 8px;
-  color: #444444;
+  font-weight: 700;
+  font-size: 13px;
+  color: #0f1419;
+  margin-bottom: 6px;
+}
+
+.form-group input, .form-group textarea {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 12px 14px;
   font-size: 14px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus, .form-group textarea:focus {
+  border-color: #667eea;
+}
+
+.form-group input.input-error {
+  border-color: #ef4444;
+}
+
+.error-banner {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
   font-weight: 600;
 }
 
-.form-group input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #cccccc;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: border-color 0.3s ease;
-  box-sizing: border-box;
-}
-
-.form-group input:focus {
-  border-color: #667eea;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-/* Messages d'erreur de validation (Sous les inputs) */
-.error-msg {
-  color: #e53e3e;
-  font-size: 12px;
-  margin-top: 5px;
-}
-
-/* Alerte d'erreur globale (Retour API) */
-.alert-error {
-  background-color: #fff5f5;
-  border-left: 4px solid #e53e3e;
-  color: #c53030;
-  padding: 12px;
-  border-radius: 4px;
-  margin-bottom: 20px;
-  font-size: 14px;
-}
-
-/* Bouton de soumission */
-.btn-submit {
-  width: 100%;
-  padding: 14px;
-  background-color: #667eea;
+.btn-auth-submit {
+  background: #667eea;
   color: #ffffff;
   border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: bold;
+  padding: 14px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 15px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.1s ease;
+  margin-top: 10px;
+  transition: opacity 0.2s;
 }
 
-.btn-submit:hover:not([disabled]) {
-  background-color: #5a6fd6;
-}
-
-.btn-submit:active:not([disabled]) {
-  transform: scale(0.98);
-}
-
-.btn-submit:disabled {
-  background-color: #cbd5e0;
+.btn-auth-submit:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
+}
+
+.auth-footer {
+  margin-top: 25px;
+  text-align: center;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.auth-footer p { margin: 0; }
+
+.btn-toggle-link {
+  background: none;
+  border: none;
+  color: #667eea;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+  margin-left: 4px;
+}
+
+.btn-toggle-link:hover {
+  text-decoration: underline;
 }

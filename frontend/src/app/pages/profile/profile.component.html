@@ -1,0 +1,94 @@
+<div class="app-layout" [ngClass]="{'sidebar-collapsed': isSidebarCollapsed}">
+  
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span class="brand-text">MiniSocial</span><span class="brand-icon">MS</span></div>
+    <div class="user-profile-summary" [routerLink]="['/profile', loggedInUser]" style="cursor: pointer;">
+      <div class="main-avatar">N</div>
+      <div class="user-info">
+        <span class="full-name">{{ loggedInUser }}</span>
+        <span class="sub-username">&#64;{{ loggedInUser.toLowerCase() }}</span>
+      </div>
+    </div>
+    <nav class="sidebar-menu">
+      <a routerLink="/feed" class="menu-item"><span class="icon">🏠</span> <span class="menu-label">Fil d'actualité</span></a>
+      <a [routerLink]="['/profile', loggedInUser]" class="menu-item active"><span class="icon">👤</span> <span class="menu-label">Mon Profil</span></a>
+    </nav>
+  </aside>
+
+  <!-- CONTENU PROFIL -->
+  <main class="feed-main-content">
+    <header class="content-header">
+      <button (click)="toggleSidebar()" class="btn-toggle-sidebar">☰</button>
+      <h2>{{ isPage ? 'Page : ' + profileUser.username : (isOwnProfile ? 'Mon Profil' : 'Profil de ' + profileUser.username) }}</h2>
+    </header>
+
+    <!-- CAS 1 : L'UTILISATEUR EST BLOQUÉ -->
+    <div *ngIf="isBlocked" class="empty-feed" style="margin-top: 50px;">
+      <p>🛡️ Vous avez bloqué cet utilisateur. Vous ne pouvez plus voir ses informations.</p>
+      <button (click)="onUnblock()" class="btn-accent-publish" style="background: #f4245e;">Débloquer</button>
+    </div>
+
+    <!-- CAS 2 : ACCÈS NORMAL AU PROFIL -->
+    <div *ngIf="!isBlocked" class="profile-scroll-area">
+      <div class="profile-hero-section">
+        <div class="cover-placeholder"></div>
+        <div class="profile-avatar-large">{{ profileUser.username.charAt(0).toUpperCase() }}</div>
+      </div>
+
+      <!-- BOUTONS D'ACTIONS (Pour les autres profils et les pages) -->
+      <div *ngIf="!isOwnProfile" class="profile-actions-bar" style="padding: 10px 20px; display: flex; gap: 10px; justify-content: flex-end;">
+        <!-- Si c'est une page communautaire -->
+        <button *ngIf="isPage && !isFollowing" (click)="onFollow()" class="btn-accent-publish">📥 Rejoindre la page</button>
+        <button *ngIf="isPage && isFollowing" (click)="onUnfollow()" class="btn-sidebar-logout" style="border-color: #cbd5e1; color: #536471;">Quitter la page</button>
+
+        <!-- Si c'est un utilisateur classique -->
+        <button *ngIf="!isPage && !isFollowing" (click)="onFollow()" class="btn-accent-publish">➕ Suivre</button>
+        <button *ngIf="!isPage && isFollowing" (click)="onUnfollow()" class="btn-sidebar-logout" style="border-color: #cbd5e1; color: #536471;">Ne plus suivre</button>
+        <button *ngIf="!isPage" (click)="onBlock()" class="btn-sidebar-logout" style="border-color: #f4245e; color: #f4245e;">🚫 Bloquer</button>
+      </div>
+
+      <!-- CONTENU DU PROFIL / FORMULAIRE -->
+      <section class="profile-meta-card">
+        <!-- Message d'alerte pour les pages privées dont on n'est pas membre -->
+        <div *ngIf="isPage && !isFollowing" class="empty-feed" style="padding: 20px; background: #f8fafc; border-radius: 12px;">
+          <p>🔒 Seuls les membres de cette page peuvent voir ses publications.</p>
+        </div>
+
+        <div *ngIf="!isPage || isFollowing">
+          <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+            <div class="form-row">
+              <label class="form-label">{{ isPage ? 'Nom de la page' : "Nom d'utilisateur" }}</label>
+              <input type="text" [value]="isPage ? profileUser.username : '@' + profileUser.username.toLowerCase()" disabled class="input-disabled" />
+            </div>
+
+            <div class="form-row">
+              <label class="form-label">Biographie / Description</label>
+              <textarea formControlName="bio" rows="3"></textarea>
+            </div>
+
+            <button *ngIf="isOwnProfile" type="submit" [disabled]="profileForm.invalid" class="btn-save-profile">Enregistrer</button>
+          </form>
+
+          <!-- LISTE DES RELATIONS (Abonnés / Abonnements) : Visible uniquement si c'est notre propre profil -->
+          <div *ngIf="isOwnProfile" class="relations-section" style="margin-top: 30px; border-top: 1px solid #eff3f4; padding-top: 20px;">
+            <div class="tabs-buttons" style="display: flex; gap: 20px; margin-bottom: 15px;">
+              <button (click)="switchTab('following')" [style.font-weight]="activeTab === 'following' ? 'bold' : 'normal'" style="background:none; border:none; cursor:pointer; color:#0f1419;">Mes Abonnements ({{ myFollowing.length }})</button>
+            </div>
+
+            <div class="friends-list">
+              <div *ngFor="let friend of (activeTab === 'following' ? myFollowing : [])" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #f8fafc; border-radius: 12px; margin-bottom: 8px;">
+                <span>{{ friend.username }} ({{ friend.type === 'page' ? 'Page' : 'User' }})</span>
+                <div style="display: flex; gap: 5px;">
+                  <button (click)="actionOnFriend('unfollow', friend)" class="btn-sidebar-logout" style="padding: 4px 10px; font-size: 12px;">Arrêter de suivre</button>
+                  <button *ngIf="friend.type === 'user'" (click)="actionOnFriend('block', friend)" class="btn-sidebar-logout" style="padding: 4px 10px; font-size: 12px; border-color:#f4245e; color:#f4245e;">Bloquer</button>
+                </div>
+              </div>
+              <p *ngIf="activeTab === 'following' && myFollowing.length === 0" style="color: #536471; font-size: 14px;">Vous ne suivez aucun compte pour l'instant.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
